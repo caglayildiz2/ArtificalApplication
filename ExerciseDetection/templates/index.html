@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExerciseDetection</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; 
+            height: 100vh;
+            color: #333;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-image: url('http://127.0.0.1:5000/bgimage.jpg'); 
+            background-size: cover; 
+            background-position: center;
+        }
+
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px; /* Rounded button shape */
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adds subtle shadow */
+            transition: background-color 0.3s, transform 0.3s; /* Smooth transition */
+        }
+
+        button:hover {
+            transform: translateY(-2px); /* Slight lift on hover */
+        }
+
+        #load-model {
+            background-color: #5d6d7e; /* HEX */
+            color: white;
+        }
+
+        #select-video {
+            background-color: #34495e; /* HEX */
+            color: white;
+        }
+
+        #upload {
+            background-color: #e74c3c; /* HEX */
+            color: white;
+            margin-top: 100px;
+        }
+
+        h1 {
+            margin-top: 150px;
+            margin-bottom: 150px;
+            font-size: 32px;
+        }
+
+        .action-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin: 0 10px 0 0;
+            font-size: 22px;
+        }
+
+        #selected-video {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>EXERCISES DETECTION</h1>
+
+    <div class="action-container">
+        <p id="model-status">Please load your model.</p>
+        <button id="load-model" onclick="loadModel()">Upload Your Model&nbsp;&nbsp;
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-box-arrow-in-down" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M3.5 6a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-8a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 1 0-1h2A1.5 1.5 0 0 1 14 6.5v8a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 14.5v-8A1.5 1.5 0 0 1 3.5 5h2a.5.5 0 0 1 0 1z"/>
+                <path fill-rule="evenodd" d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+              </svg>
+        </button>
+    </div>
+
+    <div class="action-container">
+        <p>Please select a video to detection.</p>
+        <button id="select-video" onclick="document.getElementById('video-input').click()">Upload Your Video&nbsp;&nbsp;
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-camera-reels" viewBox="0 0 16 16">
+                <path d="M6 3a3 3 0 1 1-6 0 3 3 0 0 1 6 0M1 3a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/>
+                <path d="M9 6h.5a2 2 0 0 1 1.983 1.738l3.11-1.382A1 1 0 0 1 16 7.269v7.462a1 1 0 0 1-1.406.913l-3.111-1.382A2 2 0 0 1 9.5 16H2a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zm6 8.73V7.27l-3.5 1.555v4.35zM1 8v6a1 1 0 0 0 1 1h7.5a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1"/>
+                <path d="M9 6a3 3 0 1 0 0-6 3 3 0 0 0 0 6M7 3a2 2 0 1 1 4 0 2 2 0 0 1-4 0"/>
+              </svg>
+        </button>
+    </div>
+
+    <input type="file" id="video-input" accept="video/*" style="display: none;" onchange="displaySelectedVideo()">
+    <p id="selected-video" style="display: none;">Uploaded Video: <span id="video-path"></span></p>
+
+    <button id="upload" onclick="uploadVideo()">START THE DETECTION&nbsp;&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-hourglass-split" viewBox="0 0 16 16">
+        <path d="M2.5 15a.5.5 0 1 1 0-1h1v-1a4.5 4.5 0 0 1 2.557-4.06c.29-.139.443-.377.443-.59v-.7c0-.213-.154-.451-.443-.59A4.5 4.5 0 0 1 3.5 3V2h-1a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-1v1a4.5 4.5 0 0 1-2.557 4.06c-.29.139-.443.377-.443.59v.7c0 .213.154.451.443.59A4.5 4.5 0 0 1 12.5 13v1h1a.5.5 0 0 1 0 1zm2-13v1c0 .537.12 1.045.337 1.5h6.326c.216-.455.337-.963.337-1.5V2zm3 6.35c0 .701-.478 1.236-1.011 1.492A3.5 3.5 0 0 0 4.5 13s.866-1.299 3-1.48zm1 0v3.17c2.134.181 3 1.48 3 1.48a3.5 3.5 0 0 0-1.989-3.158C8.978 9.586 8.5 9.052 8.5 8.351z"/>
+      </svg>
+
+    </button>
+
+    <script>
+        function loadModel() {
+            document.getElementById('model-status').innerText = "Please wait, loading your model";
+            fetch('/load_model')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('model-status').innerText = data.status;
+                });
+        }
+
+        function displaySelectedVideo() {
+            const videoInput = document.getElementById('video-input');
+            const videoPath = document.getElementById('video-path');
+            const selectedVideo = document.getElementById('selected-video');
+            if (videoInput.files.length > 0) {
+                videoPath.innerText = videoInput.files[0].name;
+                selectedVideo.style.display = 'block';
+            }
+        }
+
+        function uploadVideo() {
+            const videoInput = document.getElementById('video-input');
+            if (videoInput.files.length > 0) {
+                const formData = new FormData();
+                formData.append('video', videoInput.files[0]);
+
+                fetch('/upload_video', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = '/results.html';
+                        } else {
+                            alert('Failed to upload video.');
+                        }
+                    });
+            } else {
+                alert('Please select a video.');
+            }
+        }
+    </script>
+</body>
+</html>
